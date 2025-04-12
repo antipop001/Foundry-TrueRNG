@@ -1,4 +1,3 @@
-
 import { Debug } from "./Debug.js";
 import { RandomAPI } from "./RandomAPI.js";
 import { JsonRPCRequest } from './JsonRPC';
