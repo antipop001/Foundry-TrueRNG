@@ -78,7 +78,8 @@ export class TrueRandom {
             .finally(() => this.AwaitingResponse = false);
     }
     GetRandomNumber() {
-        if (!this.Enabled || !this.RandomGenerator?.ApiKey) {
+        if (!this.Enabled) return this.OriginalRandomFunction();
+        if (!this.RandomGenerator?.ApiKey) {
             if (!this.HasAlerted) {
                 this.HasAlerted = true;
                 new Dialog({
