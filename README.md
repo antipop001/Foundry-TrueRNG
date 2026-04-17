@@ -9,7 +9,7 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 - **Smart Caching**: Fetches numbers in batches to minimize API usage
 - **GM Controls**: Quick toggle button and comprehensive settings
 - **Seed Transparency**: Optional display of fetched random seeds in chat
-- **Foundry v13 Compatible**: Updated for the latest Foundry VTT version
+- **Foundry v14 Compatible**: Updated for the latest Foundry VTT version
 - **Automatic Fallback**: Uses standard randomness if API is unavailable
 
 ## Installation
@@ -77,7 +77,7 @@ To verify TrueRandom is working:
 
 ## Compatibility
 
-- **Foundry VTT**: v13+ (uses modern ES modules)
+- **Foundry VTT**: v13-v14+ (uses modern ES modules)
 - **Systems**: All systems (operates at core dice level)
 - **Modules**: Compatible with other modules
 
