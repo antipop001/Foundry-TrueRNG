@@ -5,7 +5,7 @@ export class Debug
 	{
 		try
 		{
-			return game.settings.get("TrueRandom", "DEBUG");
+			return game.settings.get("truerandom", "DEBUG");
 		}
 		catch
 		{

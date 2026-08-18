@@ -1,7 +1,7 @@
 export class Debug {
     static get Enabled() {
         try {
-            return game.settings.get("TrueRandom", "DEBUG");
+            return game.settings.get("truerandom", "DEBUG");
         }
         catch {
             return true;

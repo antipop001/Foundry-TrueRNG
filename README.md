@@ -9,8 +9,9 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 - **Smart Caching**: Fetches numbers in batches to minimize API usage
 - **GM Controls**: Quick toggle button and comprehensive settings
 - **Seed Transparency**: Optional display of fetched random seeds in chat
-- **Foundry v14 Compatible**: Updated for the latest Foundry VTT version
+- **Foundry v14 Compatible**: Verified against Foundry VTT 14.365
 - **Automatic Fallback**: Uses standard randomness if API is unavailable
+- **Failure Alerts**: Tells you when random.org is unreachable instead of degrading silently
 
 ## Installation
 
@@ -41,6 +42,22 @@ This module replaces Foundry VTT's built-in pseudo-random number generator with 
 - **Show Quick Toggle Button**: Display RndON/RndOFF button above chat (GM only)
 - **Show Seeds in Chat**: Display fetched random seeds as GM whispers for transparency
 - **Print Debug Messages**: Enable console logging for troubleshooting
+
+## When random.org Is Unavailable
+
+Dice never stop working — TrueRandom falls back to Foundry's built-in randomness — but it no longer
+does so silently:
+
+- **You get one notification per outage**, not one per roll, naming the actual cause (unreachable
+  host, HTTP error status, malformed response, or random.org's own error code and message).
+- **GMs are additionally pointed** at the API key and daily quota on the random.org dashboard.
+- **A recovery notice** appears once true randomness resumes.
+- **A quota warning** fires once when random.org reports your daily request or bit allowance is
+  spent or nearly spent.
+- **Requests back off** while the API is down (30 seconds per consecutive failure, capped at 5
+  minutes) instead of retrying on every single die roll.
+
+Switching the module off with the quick toggle is treated as a deliberate choice and stays silent.
 
 ## How It Works
 
@@ -77,7 +94,7 @@ To verify TrueRandom is working:
 
 ## Compatibility
 
-- **Foundry VTT**: v13-v14+ (uses modern ES modules)
+- **Foundry VTT**: v13-v14 (uses modern ES modules); verified against 14.365
 - **Systems**: All systems (operates at core dice level)
 - **Modules**: Compatible with other modules
 
@@ -98,7 +115,12 @@ TrueRandom enhances randomness without changing gameplay:
 
 **Seeds not displaying**: Enable "Show Seeds in Chat" and check GM whispers
 
-**API errors**: Verify API key and check daily quota at random.org
+**API errors**: TrueRandom will tell you what went wrong in a notification. Verify your API key and
+check the daily quota at [the random.org dashboard](https://api.random.org/dashboard).
+
+**Rolls feel like they stopped using random.org**: Look for a TrueRandom notification. If the API is
+down the module backs off for up to 5 minutes between retries, so it can take a moment to recover
+after the service returns.
 
 ## Credits
 

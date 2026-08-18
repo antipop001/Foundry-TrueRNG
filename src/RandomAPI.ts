@@ -8,6 +8,7 @@ export class RandomAPI
 	public BitsLeft: number = Number.MAX_SAFE_INTEGER;
 	public BitsUsed: number = 0;
 	public RequestsLeft: number = Number.MAX_SAFE_INTEGER;
+	public AdvisoryDelay: number = 0;
 
 	/**
 	 * Creates an instance of RandomAPI with the given random.org api key.
@@ -30,8 +31,12 @@ export class RandomAPI
 	// simplifies api calls using the fetch function
 	private async GetResponse<T>(method: RandomMethods, params: IKeyed, id: any): Promise<T>
 	{
-		// ensure we have an api key
-		console.assert(this.ApiKey.length > 0);
+		// ensure we have an api key. without one every request comes back as a JSON-RPC error,
+		// so fail fast with something the caller can show the user.
+		if (!this.ApiKey || !this.ApiKey.length)
+		{
+			return Promise.reject(new Error("No random.org API key is configured."));
+		}
 
 		// inject our key into the data
 		if (!params.apiKey)
@@ -53,24 +58,57 @@ export class RandomAPI
 			body: bodyString
 		};
 
-		// send the request to the end point and await a response
-		let response = await fetch(this.EndPoint, request);
+		// send the request to the end point and await a response.
+		// fetch only rejects on a network-level failure, so translate that into a clear message.
+		let response: Response;
+		try
+		{
+			response = await fetch(this.EndPoint, request);
+		}
+		catch (error)
+		{
+			return Promise.reject(new Error(`Could not reach ${this.EndPoint}: ${(error as Error)?.message ?? error}`));
+		}
+
+		// a 4xx/5xx from random.org (or a proxy in front of it) usually carries an html body,
+		// which would blow up in response.json() as an unhelpful syntax error.
+		if (!response.ok)
+		{
+			return Promise.reject(new Error(`random.org responded with HTTP ${response.status} ${response.statusText}`));
+		}
+
 		// read the body of the response as a json object, specifically the JsonRPCResponse object.
 		// we don't need to know what T is right now, just whether or not we have a result
-		let result = (await response.json()) as JsonRPCResponse<T>;
+		let result: JsonRPCResponse<T>;
+		try
+		{
+			result = (await response.json()) as JsonRPCResponse<T>;
+		}
+		catch
+		{
+			return Promise.reject(new Error("random.org returned a malformed (non-JSON) response."));
+		}
 
-		
 		// return the object if it's valid
-		if (result.result != undefined)
+		if (result?.result != undefined)
 		{
 			this.BitsLeft = result.result.bitsLeft;
 			this.BitsUsed = result.result.bitsUsed;
 			this.RequestsLeft = result.result.requestsLeft;
+			this.AdvisoryDelay = result.result.advisoryDelay;
 			return result.result.random;
 		}
 
-		// throw an error if it's not
-		return Promise.reject(result.error);
+		// throw an error if it's not. the JSON-RPC error object is not an Error, so wrap it in one
+		// that carries random.org's own code/message through to the caller.
+		if (result?.error)
+		{
+			const rpcError: any = new Error(`random.org error ${result.error.code}: ${result.error.message}`);
+			rpcError.code = result.error.code;
+			return Promise.reject(rpcError);
+		}
+
+		return Promise.reject(new Error("random.org returned a response with neither a result nor an error."));
 	}
 
 	/**
@@ -125,4 +163,4 @@ enum RandomMethods
 	getResult
 }
 
-Window["RandomAPI"] = RandomAPI;
+globalThis.RandomAPI = RandomAPI;
