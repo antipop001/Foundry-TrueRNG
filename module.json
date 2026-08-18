@@ -19,5 +19,5 @@
   ],
   "url": "https://github.com/antipop001/Foundry-TrueRNG",
   "manifest": "https://raw.githubusercontent.com/antipop001/Foundry-TrueRNG/master/module.json",
-  "download": "https://github.com/antipop001/Foundry-TrueRNG/archive/refs/heads/master.zip"
+  "download": "https://github.com/antipop001/Foundry-TrueRNG/releases/download/v2.5.0/truerng.zip"
 }
